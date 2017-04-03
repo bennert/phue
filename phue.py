@@ -301,22 +301,18 @@ class Light(object):
         return self._type
 
 class RulesConditions(dict):
-    def __init__(self, bridge, rule_id):
-        self.bridge = bridge
+    def __init__(self, rule_id):
         self.rule_id = rule_id
         
     def __setitem__(self, key, value_list):
         dict.__setitem__(self, key, value)
-        self._bridge.set_rule_conditions(self._rule_id, self)
 
 class RulesActions(dict):
-    def __init__(self, bridge, rule_id):
-        self.bridge = bridge
+    def __init__(self, rule_id):
         self.rule_id = rule_id
         
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)
-        self._bridge.set_rule_actions(self._rule_id, self)
 
 class Rule(object):
     """ Hue Rule object
@@ -333,8 +329,8 @@ class Rule(object):
         self._timestriggered = None
         self._status = None
         self._recycle = None
-#        self._conditions = RulesConditions(bridge, rule_id)
-#        self._actions = RulesActions(bridge, rule_id)
+        self._conditions = None
+        self._actions = None
 
     def __repr__(self):
         # like default python repr function, but add sensor name
@@ -410,7 +406,8 @@ class Rule(object):
     @property
     def conditions(self):
         ''' A list of dictionaries of rule conditions. [list]'''
-        return [RulesConditions(self.bridge, dict) for dict in self._get('conditions')]
+        conditions = self._get('conditions')
+        return [RulesConditions(self.bridge, dict) for dict in conditions]
 
     @conditions.setter
     def conditions(self, data):
@@ -420,7 +417,8 @@ class Rule(object):
     @property
     def actions(self):
         ''' A list of dictionaries of rule conditions. [list]'''
-        return [RulesActions(self.bridge, dict) for dict in self._get('actions')]
+        actions = self._get('actions')
+        return [RulesActions(self.bridge, dict) for dict in actions]
 
     @conditions.setter
     def actions(self, data):
