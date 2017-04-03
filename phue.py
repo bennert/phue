@@ -753,6 +753,8 @@ class Bridge(object):
         self.lights_by_name = {}
         self.sensors_by_id = {}
         self.sensors_by_name = {}
+        self.rules_by_id = {}
+        self.rules_by_name = {}
         self._name = None
 
         # self.minutes = 600 # these do not seem to be used anywhere?
@@ -929,7 +931,7 @@ class Bridge(object):
         """Returns a collection containing the rules, either by name or id (use 'id' or 'name' as the mode)
         The returned collection can be either a list (default), or a dict.
         Set mode='id' for a dict by rule ID, or mode='name' for a dict by rule name.   """
-        if self.rule_by_id == {}:
+        if self.rules_by_id == {}:
             rules = self.request('GET', '/api/' + self.username + '/rules/')
             for rule in rules:
                 self.rules_by_id[int(rule)] = Sensor(self, int(rule))
