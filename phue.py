@@ -1071,17 +1071,11 @@ class Bridge(object):
         """ Access rules as a list """
         return self.get_rules_objects()
 
-    def create_rule(self, name, owner, created, lasttriggered, timestriggered, status, recycle=False, conditions={}, actions={}):
+    def create_rule(self, name, conditions={}, actions={}):
         """ Create a new rule in the bridge. Returns (ID,None) of the new rule or (None,message) if creation failed. """
-        data = {
-            "name": name,
-            "owner": owner,
-            "created": created,
-            "lasttriggered": lasttriggered,
-            "timestriggered": timestriggered,
-            "status": status,
-            "recycle": recycle
-        }
+        """ owner, created, lasttriggered, timestriggered, status and recycle filled in automatically """
+        data = {"name": name}
+
         if (isinstance(conditions, dict) and conditions != {}):
             data["conditions"] = conditions
 
@@ -1133,8 +1127,7 @@ class Bridge(object):
 
         result = None
         logger.debug(str(data))
-        result = self.request('PUT', '/api/' + self.username + '/rules/' + str(
-            rule_id), data)
+        result = self.request('PUT', '/api/' + self.username + '/rules/' + str(rule_id), data)
         if 'error' in list(result[0].keys()):
             logger.warn("ERROR: {0} for rule {1}".format(
                 result[0]['error']['description'], rule_id))
