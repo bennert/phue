@@ -305,7 +305,7 @@ class RulesConditions(dict):
         self.bridge = bridge
         self.rule_id = rule_id
         
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value_list):
         dict.__setitem__(self, key, value)
         self._bridge.set_rule_conditions(self._rule_id, self)
 
@@ -333,8 +333,8 @@ class Rule(object):
         self._timestriggered = None
         self._status = None
         self._recycle = None
-        self._conditions = RulesConditions(bridge, rule_id)
-        self._actions = RulesActions(bridge, rule_id)
+#        self._conditions = RulesConditions(bridge, rule_id)
+#        self._actions = RulesActions(bridge, rule_id)
 
     def __repr__(self):
         # like default python repr function, but add sensor name
@@ -409,24 +409,18 @@ class Rule(object):
 
     @property
     def conditions(self):
-        ''' A dictionary of rule conditions. [dict]'''
-        data = self._get('conditions')
-        self._conditions.clear()
-        self._conditions.update(data)
-        return self._conditions
+        ''' A list of dictionaries of rule conditions. [list]'''
+        return [RulesConditions(self.bridge, dict) for dict in self._get('conditions')]
 
     @conditions.setter
     def conditions(self, data):
-        self._config.clear()
-        self._config.update(data)
+        self._conditions.clear()
+        self._conditions.update(data)
 
     @property
     def actions(self):
-        ''' A dictionary of rule conditions. [dict]'''
-        data = self._get('actions')
-        self._actions.clear()
-        self._actions.update(data)
-        return self._actions
+        ''' A list of dictionaries of rule conditions. [list]'''
+        return [RulesActions(self.bridge, dict) for dict in self._get('actions')]
 
     @conditions.setter
     def actions(self, data):
@@ -934,7 +928,7 @@ class Bridge(object):
         if self.rules_by_id == {}:
             rules = self.request('GET', '/api/' + self.username + '/rules/')
             for rule in rules:
-                self.rules_by_id[int(rule)] = Sensor(self, int(rule))
+                self.rules_by_id[int(rule)] = Rule(self, int(rule))
                 self.rules_by_name[rules[rule][
                     'name']] = self.rules_by_id[int(rule)]
         if mode == 'id':
